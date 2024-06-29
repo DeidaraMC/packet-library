@@ -7,10 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +14,7 @@ public class PacketLibraryRegistry {
     private static final Map<String, RegistryData> MATERIAL_DATA = new HashMap<>();
     private static final Map<String, RegistryData> COMPONENT_DATA = new HashMap<>();
     private static final Map<String, RegistryData> MOB_EFFECT_DATA = new HashMap<>();
+    private static final Map<String, RegistryData> POTION_DATA = new HashMap<>();
 
     static {
         String path = "1_21/registries.json";
@@ -25,6 +22,7 @@ public class PacketLibraryRegistry {
         loadRegistryData(registries, "minecraft:item", MATERIAL_DATA);
         loadRegistryData(registries, "minecraft:data_component_type", COMPONENT_DATA);
         loadRegistryData(registries, "minecraft:mob_effect", MOB_EFFECT_DATA);
+        loadRegistryData(registries, "minecraft:potion", POTION_DATA);
     }
 
     private static @NotNull JSONObject createRegistryJson(@NotNull String path) {
@@ -45,17 +43,21 @@ public class PacketLibraryRegistry {
         });
     }
 
-    public static @NotNull Map<String, RegistryData> getMaterialRegistryData() {
+    public static @NotNull Map<String, RegistryEntry> getMaterialRegistryData() {
         return new HashMap<>(MATERIAL_DATA);
     }
 
-    public static @NotNull Map<String, RegistryData> getComponentRegistryData() {
+    public static @NotNull Map<String, RegistryEntry> getComponentRegistryData() {
         return new HashMap<>(COMPONENT_DATA);
     }
 
-    public static @NotNull Map<String, RegistryData> getMobEffectRegistryData() {
+    public static @NotNull Map<String, RegistryEntry> getMobEffectRegistryData() {
         return new HashMap<>(MOB_EFFECT_DATA);
     }
 
-    public record RegistryData(@NotNull Key key, int id) { }
+    public static @NotNull Map<String, RegistryEntry> getPotionRegistryEntries() {
+        return new HashMap<>(POTION_DATA);
+    }
+
+    public record RegistryData(@NotNull Key key, int id) implements RegistryEntry { }
 }

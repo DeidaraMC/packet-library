@@ -1,6 +1,7 @@
 package com.deidaramc.packetlibrary.item.material;
 
 import com.deidaramc.packetlibrary.registry.PacketLibraryRegistry;
+import com.deidaramc.packetlibrary.registry.RegistryEntry;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -11,7 +12,7 @@ class MaterialRegistry {
     private static final MaterialImpl[] MATERIAL_BY_ID;
 
     static {
-        Map<String, PacketLibraryRegistry.RegistryData> registryData = PacketLibraryRegistry.getMaterialRegistryData();
+        Map<String, RegistryEntry> registryData = PacketLibraryRegistry.getMaterialRegistryData();
         MATERIAL_BY_ID = new MaterialImpl[registryData.size()];
         registryData.forEach((key, data) -> {
             MaterialImpl material = new MaterialImpl(data.key(), data.id());

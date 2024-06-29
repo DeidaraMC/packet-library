@@ -1,6 +1,7 @@
 package com.deidaramc.packetlibrary.item.component;
 
-import com.deidaramc.packetlibrary.potion.PotionType;
+import com.deidaramc.packetlibrary.potion.effect.PotionEffect;
+import com.deidaramc.packetlibrary.potion.type.PotionType;
 import com.deidaramc.packetlibrary.protocol.NetworkWriter;
 import com.deidaramc.packetlibrary.util.Color;
 import com.deidaramc.packetlibrary.util.ProtocolUtil;

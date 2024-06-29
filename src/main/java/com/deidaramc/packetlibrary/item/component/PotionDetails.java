@@ -1,6 +1,6 @@
 package com.deidaramc.packetlibrary.item.component;
 
-import com.deidaramc.packetlibrary.potion.PotionType;
+import com.deidaramc.packetlibrary.potion.effect.PotionEffect;
 import com.deidaramc.packetlibrary.protocol.NetworkWriter;
 import com.deidaramc.packetlibrary.util.ProtocolUtil;
 import org.jetbrains.annotations.NotNull;
@@ -9,10 +9,10 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.ByteBuffer;
 
 // Note: this is not the same as a regular potion
-public record PotionDetails(@NotNull PotionType type, int amplifier, int duration,
+public record PotionDetails(@NotNull PotionEffect type, int amplifier, int duration,
                             boolean ambient, boolean showParticles, boolean showIcon,
                             @Nullable PotionDetails hiddenEffect) implements NetworkWriter {
-    public PotionDetails(@NotNull PotionType type, int amplifier, int duration) {
+    public PotionDetails(@NotNull PotionEffect type, int amplifier, int duration) {
         this(type, amplifier, duration, false, true, true, null);
     }
 
@@ -31,7 +31,7 @@ public record PotionDetails(@NotNull PotionType type, int amplifier, int duratio
 
     public static @NotNull PotionDetails fromByteBuffer(@NotNull ByteBuffer buffer) {
         return new PotionDetails(
-                PotionType.fromId(ProtocolUtil.readVarInt(buffer)),
+                PotionEffect.fromId(ProtocolUtil.readVarInt(buffer)),
                 ProtocolUtil.readVarInt(buffer),
                 ProtocolUtil.readVarInt(buffer),
                 ProtocolUtil.readBoolean(buffer),
