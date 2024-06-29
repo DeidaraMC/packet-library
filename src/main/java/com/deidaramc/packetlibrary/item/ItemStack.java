@@ -32,6 +32,10 @@ public sealed interface ItemStack extends NetworkWriter permits ItemStackImpl {
         return ItemStackImpl.fromByteBuffer(buffer);
     }
 
+    static @NotNull Builder builder(@NotNull Material material, int amount) {
+        return new Builder(material).amount(amount);
+    }
+
     static @NotNull Builder builder(@NotNull Material material) {
         return new Builder(material);
     }
@@ -50,26 +54,26 @@ public sealed interface ItemStack extends NetworkWriter permits ItemStackImpl {
             this.amount = itemStack.amount();
         }
 
-        @NotNull Builder amount(int amount) {
+        public @NotNull Builder amount(int amount) {
             this.amount = amount;
             return this;
         }
 
-        @NotNull Builder with(@NotNull ComponentType<None> type) {
+        public @NotNull Builder with(@NotNull ComponentType<None> type) {
             return with(type, None.getInstance());
         }
 
-        <T> @NotNull Builder with(@NotNull ComponentType<T> type, T value) {
+        public <T> @NotNull Builder with(@NotNull ComponentType<T> type, T value) {
             components.addComponent(new ItemComponent<>(type, value));
             return this;
         }
 
-        <T> @NotNull Builder without(@NotNull ComponentType<T> type) {
+        public <T> @NotNull Builder without(@NotNull ComponentType<T> type) {
             components.removeComponent(type);
             return this;
         }
 
-        @NotNull ItemStack build() {
+        public @NotNull ItemStack build() {
             return new ItemStackImpl(material, amount, components);
         }
     }
