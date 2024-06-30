@@ -8,4 +8,8 @@ public interface Material extends Materials, RegistryEntry {
     static @NotNull Material fromId(int id) {
         return MaterialRegistry.getMaterial(id);
     }
+
+    static @NotNull Material fromKey(@NotNull String key) {
+        return MaterialRegistry.getMaterial(key);
+    }
 }

@@ -35,18 +35,17 @@ final class NbtComponentSerializerImpl implements NbtComponentSerializer {
     // DESERIALIZATION
 
     private @NotNull Component deserializeAnyComponent(@NotNull BinaryTag nbt) {
-        return switch (nbt) {
-            case CompoundBinaryTag compound -> deserializeComponent(compound);
-            case StringBinaryTag string -> Component.text(string.value());
-            case ListBinaryTag list -> {
-                var builder = Component.text();
-                for (var element : list) {
-                    builder.append(deserializeAnyComponent(element));
-                }
-                yield builder.build();
+        if (nbt instanceof CompoundBinaryTag compound) return deserializeComponent(compound);
+        if (nbt instanceof StringBinaryTag string) return Component.text(string.value());
+        if (nbt instanceof ListBinaryTag list) {
+            var builder = Component.text();
+            for (var element : list) {
+                builder.append(deserializeAnyComponent(element));
             }
-            default -> throw new UnsupportedOperationException("Unknown NBT type: " + nbt.getClass().getName());
-        };
+            return builder.build();
+        }
+
+        throw new UnsupportedOperationException("Unknown NBT type: " + nbt.getClass().getName());
     }
 
     private @NotNull Component deserializeComponent(@NotNull CompoundBinaryTag compound) {
