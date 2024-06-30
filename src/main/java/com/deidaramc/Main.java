@@ -1,5 +1,6 @@
 package com.deidaramc;
 
+import com.deidaramc.packetlibrary.entity.type.EntityType;
 import com.deidaramc.packetlibrary.item.ItemComponent;
 import com.deidaramc.packetlibrary.item.ItemStack;
 import com.deidaramc.packetlibrary.item.component.*;
@@ -15,6 +16,13 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        long time = System.currentTimeMillis();
+        System.out.println(EntityType.ZOMBIE);
+        System.out.println(PotionType.AWKWARD);
+        System.out.println(Material.STICK);
+        System.out.println(ItemComponent.FOOD);
+        System.out.println(System.currentTimeMillis() - time);
+
         ByteBuffer tagBuffer = ByteBuffer.allocate(1000);
         Component component = Component.text("This is a test!!");
         ProtocolUtil.writeAdventureComponent(component, tagBuffer);

@@ -3,26 +3,22 @@ package com.deidaramc.packetlibrary.registry;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import net.kyori.adventure.key.Key;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 public class PacketLibraryRegistry {
-    private static final Map<String, RegistryData> MATERIAL_DATA = new HashMap<>();
-    private static final Map<String, RegistryData> COMPONENT_DATA = new HashMap<>();
-    private static final Map<String, RegistryData> MOB_EFFECT_DATA = new HashMap<>();
-    private static final Map<String, RegistryData> POTION_DATA = new HashMap<>();
+    private static final JSONObject REGISTRIES_JSON;
 
     static {
         String path = "1_21/registries.json";
-        JSONObject registries = createRegistryJson(path);
-        loadRegistryData(registries, "minecraft:item", MATERIAL_DATA);
-        loadRegistryData(registries, "minecraft:data_component_type", COMPONENT_DATA);
-        loadRegistryData(registries, "minecraft:mob_effect", MOB_EFFECT_DATA);
-        loadRegistryData(registries, "minecraft:potion", POTION_DATA);
+        REGISTRIES_JSON = createRegistryJson(path);
     }
 
     private static @NotNull JSONObject createRegistryJson(@NotNull String path) {
@@ -33,31 +29,26 @@ public class PacketLibraryRegistry {
         }
     }
 
-    private static void loadRegistryData(@NotNull JSONObject registries, @NotNull String key, @NotNull Map<String, RegistryData> map) {
-        JSONObject registry = (JSONObject) registries.get(key);
-        JSONObject entries = (JSONObject) registry.get("entries");
-        entries.keySet().forEach(name -> {
-            JSONObject entry = (JSONObject) entries.get(name);
+    @ApiStatus.Internal
+    @SuppressWarnings("unchecked")
+    public static <T extends RegistryEntry> @NotNull RegistryResult<T> getRegistryData(
+            @NotNull RegistryType registryType, BiFunction<Key, Integer, T> supplier) {
+        JSONObject registry = REGISTRIES_JSON.getJSONObject(registryType.namespace());
+        JSONObject entries = registry.getJSONObject("entries");
+
+        Map<String, T> entryByKey = new HashMap<>();
+        T[] entryById = (T[]) Array.newInstance(registryType.registryClass(), entries.size());
+        for (String key : entries.keySet()) {
+            JSONObject entry = entries.getJSONObject(key);
             int id = entry.getInteger("protocol_id");
-            map.put(name, new RegistryData(Key.key(name), id));
-        });
+            T result = supplier.apply(Key.key(key), id);
+            entryByKey.put(key, result);
+            entryById[id] = result;
+        }
+
+        return new RegistryResult<T>(entryByKey, entryById);
     }
 
-    public static @NotNull Map<String, RegistryEntry> getMaterialRegistryData() {
-        return new HashMap<>(MATERIAL_DATA);
-    }
-
-    public static @NotNull Map<String, RegistryEntry> getComponentRegistryData() {
-        return new HashMap<>(COMPONENT_DATA);
-    }
-
-    public static @NotNull Map<String, RegistryEntry> getMobEffectRegistryData() {
-        return new HashMap<>(MOB_EFFECT_DATA);
-    }
-
-    public static @NotNull Map<String, RegistryEntry> getPotionRegistryEntries() {
-        return new HashMap<>(POTION_DATA);
-    }
-
-    public record RegistryData(@NotNull Key key, int id) implements RegistryEntry { }
+    public record RegistryResult<T extends RegistryEntry>(
+            @NotNull Map<String, T> entryByKey, T[] entryById) { }
 }

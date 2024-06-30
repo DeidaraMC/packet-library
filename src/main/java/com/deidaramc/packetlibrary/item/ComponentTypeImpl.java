@@ -10,6 +10,10 @@ import java.util.function.Function;
 record ComponentTypeImpl<T>(@NotNull Key key, int id, Function<ByteBuffer, T> reader,
                             BiConsumer<T, ByteBuffer> writer)
         implements ComponentType<T> {
+    ComponentTypeImpl(@NotNull Key key, int id) {
+        this(key, id, null, null);
+    }
+
     @Override
     public String toString() {
         return key.asString();

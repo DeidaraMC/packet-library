@@ -3,6 +3,7 @@ package com.deidaramc.packetlibrary.item;
 import com.deidaramc.packetlibrary.item.component.*;
 import com.deidaramc.packetlibrary.registry.PacketLibraryRegistry;
 import com.deidaramc.packetlibrary.registry.RegistryEntry;
+import com.deidaramc.packetlibrary.registry.RegistryType;
 import com.deidaramc.packetlibrary.util.ProtocolUtil;
 import com.deidaramc.packetlibrary.protocol.NetworkWriter;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -11,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -92,12 +92,13 @@ public class ItemComponent<T> implements NetworkWriter {
 
     @SuppressWarnings("unchecked")
     public static @NotNull ItemComponent<?> fromByteBuffer(@NotNull ByteBuffer buffer) {
-        ComponentTypeImpl<Object> type = (ComponentTypeImpl<Object>) TYPE_FROM_ID[ProtocolUtil.readVarInt(buffer)];
+        ComponentTypeImpl<Object> type = (ComponentTypeImpl<Object>) REGISTRY_RESULT.entryById()[ProtocolUtil.readVarInt(buffer)];
         return new ItemComponent<>(type, type.reader().apply(buffer));
     }
 
-    private static final Map<String, RegistryEntry> DATA = PacketLibraryRegistry.getComponentRegistryData();
-    private static final ComponentTypeImpl<?>[] TYPE_FROM_ID = new ComponentTypeImpl[DATA.size()];
+    private static final PacketLibraryRegistry.RegistryResult<ComponentType<?>> REGISTRY_RESULT =
+            PacketLibraryRegistry.getRegistryData(RegistryType.DATA_COMPONENT_TYPE, ComponentTypeImpl::new);
+
     static {
         CUSTOM_DATA = createType("minecraft:custom_data", ProtocolUtil::readNBT, ProtocolUtil::writeNBT);
         MAX_STACK_SIZE = createType("minecraft:max_stack_size", ProtocolUtil::readVarInt, ProtocolUtil::writeVarInt);
@@ -147,14 +148,16 @@ public class ItemComponent<T> implements NetworkWriter {
     }
 
     static @NotNull ComponentType<?> getType(int id) {
-        return TYPE_FROM_ID[id];
+        return REGISTRY_RESULT.entryById()[id];
     }
 
     private static <T> @NotNull ComponentType<T> createType(@NotNull String key, @NotNull Function<ByteBuffer, T> reader,
                                                             @NotNull BiConsumer<T, ByteBuffer> writer) {
-        RegistryEntry data = DATA.get(key);
+        RegistryEntry data = REGISTRY_RESULT.entryByKey().get(key);
         ComponentTypeImpl<T> type = new ComponentTypeImpl<>(data.key(), data.id(), reader, writer);
-        TYPE_FROM_ID[data.id()] = type;
+        // Override the default registry result with this new component that has a reader/writer
+        REGISTRY_RESULT.entryByKey().put(key, type);
+        REGISTRY_RESULT.entryById()[data.id()] = type;
         return type;
     }
 }
