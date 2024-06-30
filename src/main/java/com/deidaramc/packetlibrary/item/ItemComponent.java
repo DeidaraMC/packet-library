@@ -123,7 +123,7 @@ public class ItemComponent<T> implements NetworkWriter {
         DYED_COLOR = createType("minecraft:dyed_color", DyedColorComponent::fromByteBuffer, DyedColorComponent::write);
         MAP_COLOR = createType("minecraft:map_color", ByteBuffer::getInt, (v, b) -> b.putInt(v));
         MAP_ID = createType("minecraft:map_id", ProtocolUtil::readVarInt, ProtocolUtil::writeVarInt);
-        MAP_DECORATIONS = createType("minecraft:custom_model_data", ProtocolUtil::readNBT, ProtocolUtil::writeNBT);
+        MAP_DECORATIONS = createType("minecraft:map_decorations", ProtocolUtil::readNBT, ProtocolUtil::writeNBT);
         MAP_POST_PROCESSING = createType("minecraft:map_post_processing", MapPostProcessing::fromByteBuffer, MapPostProcessing::write);
         CHARGED_PROJECTILES = createType("minecraft:charged_projectiles", ProtocolUtil::readItemStackList, ProtocolUtil::writeItemStackList);
         BUNDLE_CONTENTS = createType("minecraft:bundle_contents", ProtocolUtil::readItemStackList, ProtocolUtil::writeItemStackList);
@@ -143,8 +143,8 @@ public class ItemComponent<T> implements NetworkWriter {
         //
         BASE_COLOR = createType("minecraft:base_color", DyedColorComponent::fromByteBuffer, DyedColorComponent::write);
         //
-        LOCK = createType("minecraft:recipes", ProtocolUtil::readNBT, ProtocolUtil::writeNBT);
-        CONTAINER_LOOT = createType("minecraft:recipes", ProtocolUtil::readNBT, ProtocolUtil::writeNBT);
+        LOCK = createType("minecraft:lock", ProtocolUtil::readNBT, ProtocolUtil::writeNBT);
+        CONTAINER_LOOT = createType("minecraft:container_loot", ProtocolUtil::readNBT, ProtocolUtil::writeNBT);
     }
 
     static @NotNull ComponentType<?> getType(int id) {
