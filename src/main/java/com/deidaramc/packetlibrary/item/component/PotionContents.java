@@ -32,11 +32,12 @@ public record PotionContents(@Nullable PotionType type, @Nullable RGBLike custom
     public void write(@NotNull ByteBuffer buffer) {
         boolean hasType = type != null;
         ProtocolUtil.writeBoolean(hasType, buffer);
-        ProtocolUtil.writeVarInt(hasType ? type.id() : 0, buffer);
+        if (hasType) ProtocolUtil.writeVarInt(type.id(), buffer);
+
         boolean hasCustomColor = customColor != null;
         ProtocolUtil.writeBoolean(hasCustomColor, buffer);
         if (hasCustomColor) buffer.putInt(RGBUtil.toInt(customColor));
-        else buffer.putInt(0);
+
         ProtocolUtil.writeVarInt(potionDetails.size(), buffer);
         for (PotionDetails details : potionDetails) details.write(buffer);
     }
